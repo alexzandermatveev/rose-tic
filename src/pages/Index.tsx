@@ -146,10 +146,12 @@ const Index = () => {
 
   // Handle symbol selection with haptic
   const handleSymbolSelect = useCallback((symbol: 'diamond' | 'ring') => {
+    console.log('[DEBUG] Symbol selected:', symbol);
     telegram.hapticFeedback('selection');
     game.setPlayerSymbol(symbol);
     // Automatically start the game after symbol selection
     setTimeout(() => {
+      console.log('[DEBUG] Starting game after symbol selection');
       game.startGame();
     }, 300);
   }, [telegram, game]);

@@ -27,6 +27,17 @@ export const PlayingScreen = ({
   onSettings,
 }: PlayingScreenProps) => {
   const isPlayerTurn = currentTurn === playerSymbol;
+  
+  // Debug logs
+  console.log('[DEBUG] PlayingScreen render:', {
+    board,
+    currentTurn,
+    playerSymbol,
+    isPlayerTurn,
+    isGameOver,
+    boardLength: board.length,
+    boardValues: board.map((v, i) => ({ index: i, value: v }))
+  });
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 space-y-4">
