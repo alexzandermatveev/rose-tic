@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, useState, useRef } from 'react';
 import { toast } from 'sonner';
 import { useGameLogic } from '@/hooks/useGameLogic';
 import { useTelegram } from '@/hooks/useTelegram';
@@ -19,18 +19,20 @@ const Index = () => {
   const game = useGameLogic();
   const telegram = useTelegram();
   const [promoCode, setPromoCode] = useState<string>('');
+  const hasLoggedResult = useRef(false);
 
   // Send result to backend and log for debugging
-  const sendGameResult = useCallback(async (
+  const sendGameResult = useCallback((
     status: 'win' | 'loss' | 'draw',
-    code: string | null
+    code: string | null,
+    difficulty: string
   ) => {
     const payload = {
       user_id: telegram.getUserId(),
       username: telegram.getUsername(),
       status,
       promo_code: code,
-      difficulty: game.difficulty,
+      difficulty,
     };
 
     // Debug logging
@@ -48,43 +50,54 @@ const Index = () => {
 
     // Send to backend if URL is configured
     if (BACKEND_URL) {
-      try {
-        const response = await fetch(`${BACKEND_URL}/game-result`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
+      fetch(`${BACKEND_URL}/game-result`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            console.error('[DEBUG] Backend request failed:', response.status);
+          } else {
+            console.log('[DEBUG] Backend request successful');
+          }
+        })
+        .catch((error) => {
+          console.error('[DEBUG] Backend request error:', error);
         });
-
-        if (!response.ok) {
-          console.error('[DEBUG] Backend request failed:', response.status);
-        } else {
-          console.log('[DEBUG] Backend request successful');
-        }
-      } catch (error) {
-        console.error('[DEBUG] Backend request error:', error);
-      }
     } else {
       console.log('[DEBUG] Backend URL not configured - skipping POST request');
     }
-  }, [telegram, game.difficulty]);
+  }, [telegram]);
 
-  // Handle game over states
+  // Handle game over states - runs only once per game end
   useEffect(() => {
-    if (game.status === 'win') {
-      const code = generatePromoCode();
-      setPromoCode(code);
-      telegram.hapticFeedback('success');
-      sendGameResult('win', code);
-    } else if (game.status === 'loss') {
-      telegram.hapticFeedback('error');
-      sendGameResult('loss', null);
-    } else if (game.status === 'draw') {
-      telegram.hapticFeedback('warning');
-      sendGameResult('draw', null);
+    const isGameOver = game.status === 'win' || game.status === 'loss' || game.status === 'draw';
+    
+    if (isGameOver && !hasLoggedResult.current) {
+      hasLoggedResult.current = true;
+      
+      if (game.status === 'win') {
+        const code = generatePromoCode();
+        setPromoCode(code);
+        telegram.hapticFeedback('success');
+        sendGameResult('win', code, game.difficulty);
+      } else if (game.status === 'loss') {
+        telegram.hapticFeedback('error');
+        sendGameResult('loss', null, game.difficulty);
+      } else if (game.status === 'draw') {
+        telegram.hapticFeedback('warning');
+        sendGameResult('draw', null, game.difficulty);
+      }
     }
-  }, [game.status, telegram, sendGameResult]);
+    
+    // Reset flag when game is reset
+    if (game.status === 'playing' || game.status === 'setup') {
+      hasLoggedResult.current = false;
+    }
+  }, [game.status, game.difficulty, telegram, sendGameResult]);
 
   // Handle cell click with haptic feedback
   const handleCellClick = useCallback((index: number) => {
