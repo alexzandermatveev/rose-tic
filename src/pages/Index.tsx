@@ -8,24 +8,32 @@ import { WinOverlay } from '@/components/game/WinOverlay';
 import { LossOverlay } from '@/components/game/LossOverlay';
 import { DrawOverlay } from '@/components/game/DrawOverlay';
 
-// Dynamic backend URL loading
+// Dynamic backend URL loading with Netlify environment support
 let BACKEND_URL = 'http://localhost:8000'; // default fallback
 
-// Load backend URL from config
-const loadConfig = async () => {
-  try {
-    const response = await fetch('/config.json');
-    if (response.ok) {
-      const config = await response.json();
-      BACKEND_URL = config.BACKEND_URL || BACKEND_URL;
+// Check for Netlify environment variable
+const netlifyBackendUrl = import.meta.env.VITE_BACKEND_URL;
+if (netlifyBackendUrl) {
+  BACKEND_URL = netlifyBackendUrl;
+  console.log('[CONFIG] Using backend URL from VITE_BACKEND_URL:', BACKEND_URL);
+} else {
+  // Fallback to config.json
+  const loadConfig = async () => {
+    try {
+      const response = await fetch('/config.json');
+      if (response.ok) {
+        const config = await response.json();
+        BACKEND_URL = config.BACKEND_URL || BACKEND_URL;
+        console.log('[CONFIG] Using backend URL from config.json:', BACKEND_URL);
+      }
+    } catch (error) {
+      console.warn('[CONFIG] Could not load config, using default backend URL:', error);
     }
-  } catch (error) {
-    console.warn('Could not load config, using default backend URL:', error);
-  }
-};
-
-// Load config on component mount
-loadConfig();
+  };
+  
+  // Load config on component mount
+  loadConfig();
+}
 
 const generatePromoCode = (): string => {
   return Math.floor(10000 + Math.random() * 90000).toString();
