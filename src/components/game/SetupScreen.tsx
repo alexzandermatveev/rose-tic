@@ -9,22 +9,20 @@ interface SetupScreenProps {
   playerSymbol: PlayerSymbol;
   difficulty: Difficulty;
   stats: { wins: number; losses: number; draws: number };
-  statsLoading?: boolean;
-  statsError?: string | null;
   onSymbolSelect: (symbol: PlayerSymbol) => void;
   onDifficultySelect: (difficulty: Difficulty) => void;
   onStartGame: () => void;
+  isSymbolSelected: boolean;
 }
 
 export const SetupScreen = ({
   playerSymbol,
   difficulty,
   stats,
-  statsLoading,
-  statsError,
   onSymbolSelect,
   onDifficultySelect,
   onStartGame,
+  isSymbolSelected,
 }: SetupScreenProps) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 space-y-6">
@@ -39,13 +37,11 @@ export const SetupScreen = ({
       </div>
 
       {/* Stats */}
-      <div className="glass-card rounded-xl px-6 py-3">
-        <StatsCounter 
-          {...stats} 
-          isLoading={statsLoading}
-          error={statsError}
-        />
-      </div>
+      {(stats.wins > 0 || stats.losses > 0 || stats.draws > 0) && (
+        <div className="glass-card rounded-xl px-6 py-3">
+          <StatsCounter {...stats} />
+        </div>
+      )}
 
       {/* Setup options */}
       <div className="glass-card rounded-2xl p-6 w-full max-w-sm space-y-6">
@@ -62,14 +58,16 @@ export const SetupScreen = ({
         />
       </div>
 
-      {/* Start button */}
-      <Button
-        onClick={onStartGame}
-        className="gold-gradient text-white hover:opacity-90 gap-2 px-8 py-3 shadow-glow"
-      >
-        <Play size={20} />
-        Start Game
-      </Button>
+      {/* Start button - hidden when symbol is selected since game starts automatically */}
+      {!isSymbolSelected && (
+        <Button
+          onClick={onStartGame}
+          className="gold-gradient text-white hover:opacity-90 gap-2 px-8 py-3 shadow-glow"
+        >
+          <Play size={20} />
+          Start Game
+        </Button>
+      )}
     </div>
   );
 };

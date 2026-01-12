@@ -2,7 +2,6 @@ import { useEffect, useCallback, useState, useRef } from 'react';
 import { toast } from 'sonner';
 import { useGameLogic } from '@/hooks/useGameLogic';
 import { useTelegram } from '@/hooks/useTelegram';
-import { useUserStats } from '@/hooks/useUserStats';
 import { SetupScreen } from '@/components/game/SetupScreen';
 import { PlayingScreen } from '@/components/game/PlayingScreen';
 import { WinOverlay } from '@/components/game/WinOverlay';
@@ -147,10 +146,12 @@ const Index = () => {
 
   // Handle symbol selection with haptic
   const handleSymbolSelect = useCallback((symbol: 'diamond' | 'ring') => {
-    console.log('[DEBUG] Symbol selected:', symbol);
     telegram.hapticFeedback('selection');
     game.setPlayerSymbol(symbol);
-    // Don't auto-start game - let user click Start Game button
+    // Automatically start the game after symbol selection
+    setTimeout(() => {
+      game.startGame();
+    }, 300);
   }, [telegram, game]);
 
   // Handle difficulty selection with haptic
@@ -178,9 +179,8 @@ const Index = () => {
   }, [telegram, game]);
 
   const isGameOver = game.status === 'win' || game.status === 'loss' || game.status === 'draw';
-  
-  // Get real user statistics
-  const { stats: userStats, isLoading: statsLoading, error: statsError } = useUserStats();
+  // Track if symbol has been selected (when status changes to playing or we have a non-default symbol)
+  const isSymbolSelected = game.status === 'playing' || game.playerSymbol !== 'diamond' || game.computerSymbol !== 'ring';
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
@@ -188,12 +188,11 @@ const Index = () => {
         <SetupScreen
           playerSymbol={game.playerSymbol}
           difficulty={game.difficulty}
-          stats={userStats}
-          statsLoading={statsLoading}
-          statsError={statsError}
+          stats={game.stats}
           onSymbolSelect={handleSymbolSelect}
           onDifficultySelect={handleDifficultySelect}
           onStartGame={handleStartGame}
+          isSymbolSelected={isSymbolSelected}
         />
       ) : (
         <PlayingScreen

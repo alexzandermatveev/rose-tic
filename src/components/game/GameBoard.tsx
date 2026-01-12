@@ -10,9 +10,6 @@ interface GameBoardProps {
 }
 
 export const GameBoard = ({ board, winningLine, isPlayerTurn, isGameOver, onCellClick }: GameBoardProps) => {
-  // Debug logs
-  console.log('[DEBUG] GameBoard render:', { board, isPlayerTurn, isGameOver, winningLine });
-  
   return (
     <div className="glass-card rounded-2xl p-4 shadow-glass">
       <div className="grid grid-cols-3 w-full max-w-[280px] mx-auto aspect-square">

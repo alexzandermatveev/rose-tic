@@ -10,11 +10,11 @@ from enum import Enum
 
 app = FastAPI(
     title="Rose Tic Tac Toe API",
-    description="Simple backend API for Telegram Tic Tac Toe mini-app",
+    description="Backend API for Telegram Tic Tac Toe mini-app",
     version="1.0.0"
 )
 
-# Configure CORS for development
+# Configure CORS for PythonAnywhere
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -69,24 +69,39 @@ class PromoCodeResponse(BaseModel):
     used_at: Optional[str] = None
     created_at: str
 
-# File storage
+# File storage - PythonAnywhere compatible path
 DATA_FILE = "game_data.json"
 
 def load_data():
     """Load data from JSON file"""
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    return {
-        "users": {},
-        "game_results": [],
-        "promo_codes": {}
-    }
+    try:
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        else:
+            # Create initial data structure
+            initial_data = {
+                "users": {},
+                "game_results": [],
+                "promo_codes": {}
+            }
+            save_data(initial_data)
+            return initial_data
+    except Exception as e:
+        print(f"Error loading data: {e}")
+        return {
+            "users": {},
+            "game_results": [],
+            "promo_codes": {}
+        }
 
 def save_data(data):
     """Save data to JSON file"""
-    with open(DATA_FILE, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    try:
+        with open(DATA_FILE, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        print(f"Error saving data: {e}")
 
 def generate_promo_code():
     """Generate unique 5-digit promo code"""
@@ -97,7 +112,8 @@ async def root():
     """Health check endpoint"""
     return {
         "message": "Rose Tic Tac Toe API is running!",
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.utcnow().isoformat(),
+        "status": "ok"
     }
 
 @app.post("/game-result", response_model=GameResultResponse)
@@ -120,8 +136,8 @@ async def record_game_result(game_data: GameResultCreate):
         game_result = {
             "id": result_id,
             "user_id": game_data.user_id,
-            "status": game_data.status,
-            "difficulty": game_data.difficulty,
+            "status": game_data.status.value,
+            "difficulty": game_data.difficulty.value,
             "created_at": datetime.utcnow().isoformat()
         }
         
@@ -298,4 +314,10 @@ async def get_leaderboard(limit: int = 10):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+    print("🚀 Starting Tic-Tac-Toe backend server...")
+    uvicorn.run(
+        "pa_backend:app",
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 8000)),
+        reload=False  # Disable reload for production
+    )
