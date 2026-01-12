@@ -12,7 +12,6 @@ interface SetupScreenProps {
   onSymbolSelect: (symbol: PlayerSymbol) => void;
   onDifficultySelect: (difficulty: Difficulty) => void;
   onStartGame: () => void;
-  isSymbolSelected: boolean;
 }
 
 export const SetupScreen = ({
@@ -22,7 +21,6 @@ export const SetupScreen = ({
   onSymbolSelect,
   onDifficultySelect,
   onStartGame,
-  isSymbolSelected,
 }: SetupScreenProps) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 space-y-6">
@@ -58,16 +56,14 @@ export const SetupScreen = ({
         />
       </div>
 
-      {/* Start button - hidden when symbol is selected since game starts automatically */}
-      {!isSymbolSelected && (
-        <Button
-          onClick={onStartGame}
-          className="gold-gradient text-white hover:opacity-90 gap-2 px-8 py-3 shadow-glow"
-        >
-          <Play size={20} />
-          Start Game
-        </Button>
-      )}
+      {/* Start button */}
+      <Button
+        onClick={onStartGame}
+        className="gold-gradient text-white hover:opacity-90 gap-2 px-8 py-3 shadow-glow"
+      >
+        <Play size={20} />
+        Start Game
+      </Button>
     </div>
   );
 };

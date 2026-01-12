@@ -149,11 +149,7 @@ const Index = () => {
     console.log('[DEBUG] Symbol selected:', symbol);
     telegram.hapticFeedback('selection');
     game.setPlayerSymbol(symbol);
-    // Automatically start the game after symbol selection
-    setTimeout(() => {
-      console.log('[DEBUG] Starting game after symbol selection');
-      game.startGame();
-    }, 300);
+    // Don't auto-start game - let user click Start Game button
   }, [telegram, game]);
 
   // Handle difficulty selection with haptic
@@ -181,8 +177,6 @@ const Index = () => {
   }, [telegram, game]);
 
   const isGameOver = game.status === 'win' || game.status === 'loss' || game.status === 'draw';
-  // Track if symbol has been selected (when status changes to playing or we have a non-default symbol)
-  const isSymbolSelected = game.status === 'playing' || game.playerSymbol !== 'diamond' || game.computerSymbol !== 'ring';
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
@@ -194,7 +188,6 @@ const Index = () => {
           onSymbolSelect={handleSymbolSelect}
           onDifficultySelect={handleDifficultySelect}
           onStartGame={handleStartGame}
-          isSymbolSelected={isSymbolSelected}
         />
       ) : (
         <PlayingScreen

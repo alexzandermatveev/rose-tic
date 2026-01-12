@@ -33,7 +33,7 @@ const WINNING_LINES = [
 
 const initialState: GameState = {
   board: Array(9).fill(null),
-  currentTurn: 'diamond',
+  currentTurn: 'ring', // Computer (ring) goes first
   playerSymbol: 'diamond',
   computerSymbol: 'ring',
   difficulty: 'relaxed',
@@ -300,7 +300,7 @@ export const useGameLogic = () => {
       const newState = {
         ...prev,
         board: Array(9).fill(null),
-        currentTurn: 'diamond' as PlayerSymbol, // Diamond always goes first
+        currentTurn: prev.computerSymbol, // Computer always goes first
         status: 'playing' as GameStatus,
         winningLine: null,
       };
@@ -319,7 +319,7 @@ export const useGameLogic = () => {
     setState(prev => ({
       ...prev,
       board: Array(9).fill(null),
-      currentTurn: 'diamond',
+      currentTurn: prev.computerSymbol,
       status: 'playing',
       winningLine: null,
     }));
@@ -329,7 +329,7 @@ export const useGameLogic = () => {
     setState(prev => ({
       ...prev,
       board: Array(9).fill(null),
-      currentTurn: 'diamond',
+      currentTurn: prev.computerSymbol,
       status: 'setup',
       winningLine: null,
     }));
