@@ -158,6 +158,48 @@ async def record_game_result(game_data: GameResultCreate):
             detail=f"Failed to record game result: {str(e)}"
         )
 
+@app.get("/user/{user_id}/stats/simple")
+async def get_user_stats_simple(user_id: int):
+    """Get simplified user statistics (wins, losses, draws only)"""
+    try:
+        data = load_data()
+        user_id_str = str(user_id)
+        
+        # Check if user exists
+        if user_id_str not in data["users"]:
+            return {
+                "user_id": user_id,
+                "stats": {
+                    "wins": 0,
+                    "losses": 0,
+                    "draws": 0
+                }
+            }
+        
+        user_games = [g for g in data["game_results"] if g["user_id"] == user_id]
+        
+        # Calculate simple statistics
+        wins = len([g for g in user_games if g["status"] == "win"])
+        losses = len([g for g in user_games if g["status"] == "loss"])
+        draws = len([g for g in user_games if g["status"] == "draw"])
+        
+        return {
+            "user_id": user_id,
+            "stats": {
+                "wins": wins,
+                "losses": losses,
+                "draws": draws
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting user stats: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to retrieve user statistics: {str(e)}"
+        )
+
+
 @app.get("/user/{user_id}/stats", response_model=UserStatsResponse)
 async def get_user_statistics(user_id: int):
     """Get user statistics"""

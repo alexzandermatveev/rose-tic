@@ -2,6 +2,7 @@ import { useEffect, useCallback, useState, useRef } from 'react';
 import { toast } from 'sonner';
 import { useGameLogic } from '@/hooks/useGameLogic';
 import { useTelegram } from '@/hooks/useTelegram';
+import { useUserStats } from '@/hooks/useUserStats';
 import { SetupScreen } from '@/components/game/SetupScreen';
 import { PlayingScreen } from '@/components/game/PlayingScreen';
 import { WinOverlay } from '@/components/game/WinOverlay';
@@ -177,6 +178,9 @@ const Index = () => {
   }, [telegram, game]);
 
   const isGameOver = game.status === 'win' || game.status === 'loss' || game.status === 'draw';
+  
+  // Get real user statistics
+  const { stats: userStats, isLoading: statsLoading, error: statsError } = useUserStats();
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
@@ -184,7 +188,9 @@ const Index = () => {
         <SetupScreen
           playerSymbol={game.playerSymbol}
           difficulty={game.difficulty}
-          stats={game.stats}
+          stats={userStats}
+          statsLoading={statsLoading}
+          statsError={statsError}
           onSymbolSelect={handleSymbolSelect}
           onDifficultySelect={handleDifficultySelect}
           onStartGame={handleStartGame}

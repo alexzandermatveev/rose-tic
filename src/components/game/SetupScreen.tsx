@@ -9,6 +9,8 @@ interface SetupScreenProps {
   playerSymbol: PlayerSymbol;
   difficulty: Difficulty;
   stats: { wins: number; losses: number; draws: number };
+  statsLoading?: boolean;
+  statsError?: string | null;
   onSymbolSelect: (symbol: PlayerSymbol) => void;
   onDifficultySelect: (difficulty: Difficulty) => void;
   onStartGame: () => void;
@@ -18,6 +20,8 @@ export const SetupScreen = ({
   playerSymbol,
   difficulty,
   stats,
+  statsLoading,
+  statsError,
   onSymbolSelect,
   onDifficultySelect,
   onStartGame,
@@ -35,11 +39,13 @@ export const SetupScreen = ({
       </div>
 
       {/* Stats */}
-      {(stats.wins > 0 || stats.losses > 0 || stats.draws > 0) && (
-        <div className="glass-card rounded-xl px-6 py-3">
-          <StatsCounter {...stats} />
-        </div>
-      )}
+      <div className="glass-card rounded-xl px-6 py-3">
+        <StatsCounter 
+          {...stats} 
+          isLoading={statsLoading}
+          error={statsError}
+        />
+      </div>
 
       {/* Setup options */}
       <div className="glass-card rounded-2xl p-6 w-full max-w-sm space-y-6">
