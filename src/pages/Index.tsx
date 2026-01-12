@@ -8,8 +8,24 @@ import { WinOverlay } from '@/components/game/WinOverlay';
 import { LossOverlay } from '@/components/game/LossOverlay';
 import { DrawOverlay } from '@/components/game/DrawOverlay';
 
-// Placeholder for backend URL - will be configured later
-const BACKEND_URL = '';
+// Dynamic backend URL loading
+let BACKEND_URL = 'http://localhost:8000'; // default fallback
+
+// Load backend URL from config
+const loadConfig = async () => {
+  try {
+    const response = await fetch('/config.json');
+    if (response.ok) {
+      const config = await response.json();
+      BACKEND_URL = config.BACKEND_URL || BACKEND_URL;
+    }
+  } catch (error) {
+    console.warn('Could not load config, using default backend URL:', error);
+  }
+};
+
+// Load config on component mount
+loadConfig();
 
 const generatePromoCode = (): string => {
   return Math.floor(10000 + Math.random() * 90000).toString();
