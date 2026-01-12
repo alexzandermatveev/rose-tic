@@ -163,8 +163,17 @@ export const useGameLogic = () => {
   }, [getRelaxedMove, getStrategicMove, getMasterMove]);
 
   const makeMove = useCallback((cellIndex: number) => {
+    console.log('[DEBUG] makeMove called with cellIndex:', cellIndex);
     setState(prev => {
+      console.log('[DEBUG] makeMove state check:', {
+        status: prev.status,
+        cellValue: prev.board[cellIndex],
+        currentTurn: prev.currentTurn,
+        playerSymbol: prev.playerSymbol,
+        canMove: prev.status === 'playing' && prev.board[cellIndex] === null && prev.currentTurn === prev.playerSymbol,
+      });
       if (prev.status !== 'playing' || prev.board[cellIndex] !== null || prev.currentTurn !== prev.playerSymbol) {
+        console.log('[DEBUG] Move blocked - conditions not met');
         return prev;
       }
 
@@ -262,11 +271,20 @@ export const useGameLogic = () => {
   }, [state.status, state.currentTurn, state.computerSymbol, state.board, state.difficulty, state.playerSymbol, getComputerMove, checkWinner, isBoardFull]);
 
   const setPlayerSymbol = useCallback((symbol: PlayerSymbol) => {
-    setState(prev => ({
-      ...prev,
-      playerSymbol: symbol,
-      computerSymbol: symbol === 'diamond' ? 'ring' : 'diamond',
-    }));
+    console.log('[DEBUG] setPlayerSymbol called with:', symbol);
+    setState(prev => {
+      const newComputerSymbol: PlayerSymbol = symbol === 'diamond' ? 'ring' : 'diamond';
+      const newState = {
+        ...prev,
+        playerSymbol: symbol,
+        computerSymbol: newComputerSymbol,
+      };
+      console.log('[DEBUG] New state after symbol select:', {
+        playerSymbol: newState.playerSymbol,
+        computerSymbol: newState.computerSymbol,
+      });
+      return newState;
+    });
   }, []);
 
   const setDifficulty = useCallback((difficulty: Difficulty) => {
@@ -277,13 +295,24 @@ export const useGameLogic = () => {
   }, []);
 
   const startGame = useCallback(() => {
-    setState(prev => ({
-      ...prev,
-      board: Array(9).fill(null),
-      currentTurn: 'diamond', // Diamond (X) always goes first
-      status: 'playing',
-      winningLine: null,
-    }));
+    console.log('[DEBUG] startGame called');
+    setState(prev => {
+      const newState = {
+        ...prev,
+        board: Array(9).fill(null),
+        currentTurn: 'diamond' as PlayerSymbol, // Diamond always goes first
+        status: 'playing' as GameStatus,
+        winningLine: null,
+      };
+      console.log('[DEBUG] Game started with state:', {
+        playerSymbol: newState.playerSymbol,
+        computerSymbol: newState.computerSymbol,
+        currentTurn: newState.currentTurn,
+        status: newState.status,
+        isPlayerTurn: newState.currentTurn === newState.playerSymbol,
+      });
+      return newState;
+    });
   }, []);
 
   const resetGame = useCallback(() => {

@@ -125,6 +125,12 @@ const Index = () => {
 
   // Handle cell click with haptic feedback
   const handleCellClick = useCallback((index: number) => {
+    console.log('[DEBUG] handleCellClick called with index:', index, {
+      cellValue: game.board[index],
+      currentTurn: game.currentTurn,
+      playerSymbol: game.playerSymbol,
+      canClick: game.board[index] === null && game.currentTurn === game.playerSymbol,
+    });
     if (game.board[index] === null && game.currentTurn === game.playerSymbol) {
       telegram.hapticFeedback('light');
       game.makeMove(index);
