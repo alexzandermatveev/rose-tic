@@ -314,10 +314,20 @@ async def get_leaderboard(limit: int = 10):
 
 if __name__ == "__main__":
     import uvicorn
-    print("🚀 Starting Tic-Tac-Toe backend server...")
-    uvicorn.run(
-        "pa_backend:app",
-        host="0.0.0.0",
-        port=int(os.environ.get("PORT", 8000)),
-        reload=False  # Disable reload for production
-    )
+    port = int(os.environ.get("PORT", 8000))
+    print(f"🚀 Starting Tic-Tac-Toe backend server on port {port}...")
+    
+    try:
+        uvicorn.run(
+            "pa_backend:app",
+            host="0.0.0.0",
+            port=port,
+            reload=False  # Disable reload for production
+        )
+    except OSError as e:
+        if "address already in use" in str(e).lower():
+            print(f"❌ Port {port} is already in use!")
+            print("Try setting PORT environment variable to a different port")
+        else:
+            print(f"❌ Failed to start server: {e}")
+        sys.exit(1)

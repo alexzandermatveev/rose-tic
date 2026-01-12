@@ -21,14 +21,31 @@ def start_services():
     """Start both backend and bot services"""
     print("🚀 Starting Tic-Tac-Toe services...")
     
-    # Start backend
+    # Start backend with port checking
     print("Starting backend server...")
+    backend_env = os.environ.copy()
+    backend_env["PORT"] = "8001"  # Use different port
+    
     backend_process = subprocess.Popen([
         sys.executable, str(BACKEND_SCRIPT)
-    ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    ], env=backend_env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     
-    # Wait a moment for backend to start
-    time.sleep(2)
+    # Wait for backend to start
+    time.sleep(3)
+    
+    # Check if backend started successfully
+    backend_check = subprocess.run([
+        "curl", "-s", "http://localhost:8001/", "--max-time", "5"
+    ], capture_output=True)
+    
+    if backend_check.returncode != 0:
+        print("⚠️ Backend failed to start. Checking error output...")
+        stdout, stderr = backend_process.communicate(timeout=1)
+        if stderr:
+            print(f"Backend error: {stderr.decode()}")
+        return False
+    
+    print("✅ Backend started successfully")
     
     # Start bot
     print("Starting Telegram bot...")
@@ -86,8 +103,17 @@ def status():
             bot_running = subprocess.run(["ps", "-p", str(bot_pid)], 
                                        capture_output=True).returncode == 0
             
+            # Check if backend is actually responding
+            if backend_running:
+                backend_responding = subprocess.run([
+                    "curl", "-s", "http://localhost:8001/", "--max-time", "3"
+                ], capture_output=True).returncode == 0
+                backend_status = "🟢 Running" if backend_responding else "🟡 Not responding"
+            else:
+                backend_status = "🔴 Stopped"
+            
             print(f"📊 Service Status:")
-            print(f"Backend (PID {backend_pid}): {'🟢 Running' if backend_running else '🔴 Stopped'}")
+            print(f"Backend (PID {backend_pid}): {backend_status}")
             print(f"Bot (PID {bot_pid}): {'🟢 Running' if bot_running else '🔴 Stopped'}")
             
         except Exception as e:
