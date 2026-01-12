@@ -1,4 +1,3 @@
-import { Diamond, Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CellValue } from '@/hooks/useGameLogic';
 
@@ -13,26 +12,27 @@ export const GameSymbol = ({ symbol, className, size = 48, animated = true }: Ga
   if (!symbol) return null;
 
   const baseClasses = cn(
-    'symbol-icon transition-all',
+    'symbol-icon transition-all flex items-center justify-center',
     animated && 'animate-symbol-enter',
     className
   );
 
+  const emojiStyle = {
+    fontSize: `${size}px`,
+    lineHeight: 1,
+  };
+
   if (symbol === 'diamond') {
     return (
-      <Diamond 
-        size={size} 
-        className={baseClasses}
-        strokeWidth={1.5}
-      />
+      <div className={baseClasses} style={emojiStyle}>
+        💎
+      </div>
     );
   }
 
   return (
-    <Circle 
-      size={size} 
-      className={baseClasses}
-      strokeWidth={1.5}
-    />
+    <div className={baseClasses} style={emojiStyle}>
+      💍
+    </div>
   );
 };

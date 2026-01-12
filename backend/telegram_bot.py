@@ -6,7 +6,28 @@ import os
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
+# Explicitly specify the path to .env file
+env_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(env_path)
+
+# Debug: Print current working directory and check if .env exists
+import os
+print(f"Current working directory: {os.getcwd()}")
+print(f"Looking for .env at: {env_path}")
+print(f".env file exists: {os.path.exists(env_path)}")
+if os.path.exists(env_path):
+    with open(env_path, 'r') as f:
+        print(".env contents:")
+        print(f.read())
+
+# Debug: Print current working directory and check if .env exists
+import os
+print(f"Current working directory: {os.getcwd()}")
+print(f".env file exists: {os.path.exists('.env')}")
+if os.path.exists('.env'):
+    with open('.env', 'r') as f:
+        print(".env contents:")
+        print(f.read())
 
 # Enable logging
 logging.basicConfig(
@@ -22,6 +43,7 @@ if not BOT_TOKEN:
 
 # Your web app URL (will be configured later)
 WEB_APP_URL = os.getenv('WEB_APP_URL', 'https://your-domain.com')  # Change this to your actual domain
+logger.info(f"Web App URL configured as: {WEB_APP_URL}")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send welcome message with Web App button"""

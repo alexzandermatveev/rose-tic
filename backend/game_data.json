@@ -4,6 +4,16 @@
       "id": 123456789,
       "username": "testuser",
       "created_at": "2026-01-12T07:55:35.754706"
+    },
+    "0": {
+      "id": 0,
+      "username": "anonymous",
+      "created_at": "2026-01-12T09:24:15.090596"
+    },
+    "403023801": {
+      "id": 403023801,
+      "username": "alexzmat",
+      "created_at": "2026-01-12T09:57:28.649062"
     }
   },
   "game_results": [
@@ -14,6 +24,36 @@
       "difficulty": "master",
       "created_at": "2026-01-12T07:55:35.754706",
       "promo_code": "28498"
+    },
+    {
+      "id": 2,
+      "user_id": 0,
+      "status": "loss",
+      "difficulty": "relaxed",
+      "created_at": "2026-01-12T09:24:15.090596"
+    },
+    {
+      "id": 3,
+      "user_id": 403023801,
+      "status": "win",
+      "difficulty": "relaxed",
+      "created_at": "2026-01-12T09:57:28.649062",
+      "promo_code": "66149"
+    },
+    {
+      "id": 4,
+      "user_id": 403023801,
+      "status": "loss",
+      "difficulty": "relaxed",
+      "created_at": "2026-01-12T09:59:36.127896"
+    },
+    {
+      "id": 5,
+      "user_id": 403023801,
+      "status": "win",
+      "difficulty": "strategic",
+      "created_at": "2026-01-12T10:04:16.952454",
+      "promo_code": "77622"
     }
   ],
   "promo_codes": {
@@ -24,6 +64,22 @@
       "is_used": true,
       "created_at": "2026-01-12T07:55:35.754706",
       "used_at": "2026-01-12T07:56:28.279682"
+    },
+    "66149": {
+      "code": "66149",
+      "user_id": 403023801,
+      "game_result_id": 3,
+      "is_used": false,
+      "created_at": "2026-01-12T09:57:28.649062",
+      "used_at": null
+    },
+    "77622": {
+      "code": "77622",
+      "user_id": 403023801,
+      "game_result_id": 5,
+      "is_used": false,
+      "created_at": "2026-01-12T10:04:16.952454",
+      "used_at": null
     }
   }
 }
